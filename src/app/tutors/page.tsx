@@ -48,7 +48,9 @@ export default function BrowseTutorsPage() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/categories");
+        const res = await fetch(
+          "https://skill-server-application.vercel.app/api/admin/categories",
+        );
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
         setCategories(data.data);
@@ -74,7 +76,7 @@ export default function BrowseTutorsPage() {
         }
         // No minRating and maxPrice filters here, add if you want
 
-        const url = `http://localhost:5000/api/tutor?${params.toString()}`;
+        const url = `https://skill-server-application.vercel.app/api/tutor?${params.toString()}`;
 
         const res = await fetch(url, { method: "GET", credentials: "include" });
         if (!res.ok) {

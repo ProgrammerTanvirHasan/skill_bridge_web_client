@@ -30,7 +30,7 @@ interface Review {
 }
 
 type UserRole = "STUDENT" | "TUTOR" | "ADMIN" | null;
-
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 export default function TutorProfilePage({
   params,
 }: {
@@ -54,14 +54,16 @@ export default function TutorProfilePage({
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch("/api/auth/session", { credentials: "include" });
+        const res = await fetch("/api/auth/session", {
+          credentials: "include",
+        });
         const data = await res.json();
         const user = data?.data?.data ?? data?.data ?? data?.user ?? null;
         const role = user?.role ?? null;
         setUserRole(
           role === "STUDENT" || role === "TUTOR" || role === "ADMIN"
             ? role
-            : null
+            : null,
         );
       } catch {
         setUserRole(null);
@@ -78,7 +80,7 @@ export default function TutorProfilePage({
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/tutor/${id}`, {
+        const res = await fetch(`${API}/api/tutor/${id}`, {
           credentials: "include",
         });
         if (!res.ok) {
@@ -164,7 +166,7 @@ export default function TutorProfilePage({
       router.push("/dashboard/bookings");
     } catch (err: unknown) {
       setBookingError(
-        err instanceof Error ? err.message : "Something went wrong"
+        err instanceof Error ? err.message : "Something went wrong",
       );
     } finally {
       setBookingLoading(false);

@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function TutorProfilePage() {
   const session = await getSession();
 
-  const loggedInUserEmail = session?.data?.data?.email ?? null;
+  const loggedInUserEmail = (session as any)?.data?.data?.email ?? null;
 
   const [profileRes, categoriesRes] = await Promise.all([
     getMyTutorProfile(),

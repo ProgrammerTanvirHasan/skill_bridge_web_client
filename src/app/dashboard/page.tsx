@@ -6,17 +6,17 @@ export default function StudentDashboardPage() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">My Bookings</h2>
           <p>View and manage your upcoming tutoring sessions.</p>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">Favorite Tutors</h2>
           <p>Keep track of your preferred tutors for quick access.</p>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">Reviews</h2>
           <p>See and manage your reviews of tutors you've worked with.</p>
         </div>

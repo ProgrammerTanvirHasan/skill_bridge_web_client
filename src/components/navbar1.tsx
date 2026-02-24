@@ -46,7 +46,9 @@ export function Navbar1({ className }: { className?: string }) {
   useEffect(() => setMounted(true), []);
 
   const loginHref =
-    pathname === "/" ? "/login" : `/login?redirect=${encodeURIComponent(pathname)}`;
+    pathname === "/"
+      ? "/login"
+      : `/login?redirect=${encodeURIComponent(pathname)}`;
 
   const logout = async () => {
     await authClient.signOut();

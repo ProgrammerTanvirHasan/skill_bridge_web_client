@@ -1,8 +1,20 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 
-type User = { id?: string; name?: string; email?: string; role?: string; [key: string]: unknown } | null;
+type User = {
+  id?: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  [key: string]: unknown;
+} | null;
 
 type SessionContextValue = {
   user: User;
@@ -38,7 +50,7 @@ export function SessionProvider({
 
   const value = useMemo(
     () => ({ user, setUser, refreshSession }),
-    [user, setUser, refreshSession]
+    [user, setUser, refreshSession],
   );
 
   return (

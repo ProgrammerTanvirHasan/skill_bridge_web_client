@@ -6,19 +6,19 @@ export default function TutorDashboardPage() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">Your Profile</h2>
           <p>
             Update your bio, hourly rate, availability status, and categories.
           </p>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">Upcoming Bookings</h2>
           <p>Check your upcoming tutoring sessions and manage your schedule.</p>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-5">
+        <div className=" shadow-md rounded-lg p-5">
           <h2 className="text-xl font-semibold mb-2">Student Reviews</h2>
           <p>Read feedback from your students and improve your teaching.</p>
         </div>

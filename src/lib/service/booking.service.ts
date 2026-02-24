@@ -2,8 +2,7 @@
 
 import { BookingStatus } from "@/types";
 import { cookies } from "next/headers";
-
-
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 export async function createBooking(payload: {
   tutorId: number;
   scheduledAt: Date;
@@ -14,7 +13,7 @@ export async function createBooking(payload: {
       tutorId: payload.tutorId,
       scheduledAt: payload.scheduledAt.toISOString(),
     };
-    const res = await fetch(`http://localhost:5000/api/bookings`, {
+    const res = await fetch(`${API}/api/bookings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +33,7 @@ export async function createBooking(payload: {
 export async function getMyBookings() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/bookings`, {
+    const res = await fetch(`${API}/api/bookings`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -49,7 +48,7 @@ export async function getMyBookings() {
 export async function getBookingById(id: number) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
+    const res = await fetch(`${API}/api/bookings/${id}`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -64,7 +63,7 @@ export async function getBookingById(id: number) {
 export async function getTutorBookings() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch("http://localhost:5000/api/bookings/tutor/me", {
+    const res = await fetch(`${API}/api/bookings/tutor/me`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -82,7 +81,7 @@ export async function updateBookingStatus(
 ) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/bookings/${id}/status`, {
+    const res = await fetch(`${API}/api/bookings/${id}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

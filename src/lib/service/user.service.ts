@@ -1,16 +1,25 @@
 "use server";
 
 import { cookies } from "next/headers";
-
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 export async function getSession() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/user/me`, {
+    const res = await fetch(`${API}/api/user/me`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
-    const session = await res.json();
-    if (!session) return { data: null, error: { message: "data missing" } };
+    let session: unknown = null;
+    try {
+      session = await res.json();
+    } catch {
+      session = null;
+    }
+
+    if (!res.ok || !session) {
+      return { data: null, error: session ?? { message: "unauthorized" } };
+    }
+
     return { data: session, error: null };
   } catch {
     return { data: null, error: { message: "something went wrong" } };
@@ -20,7 +29,7 @@ export async function getSession() {
 export async function getAllUsers() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/user`, {
+    const res = await fetch(`${API}/api/user`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -35,7 +44,7 @@ export async function getAllUsers() {
 export async function getUserById(id: string) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:5000/api/user/${id}`, {
+    const res = await fetch(`${API}/api/user/${id}`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -53,7 +62,7 @@ export async function updateProfile(payload: {
 }) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch("http://localhost:5000/api/user/update", {
+    const res = await fetch(`${API}/api/user/update`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
