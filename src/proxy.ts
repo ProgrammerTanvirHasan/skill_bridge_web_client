@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/service/user.service";
-import { Roles } from "./types/roles";
+import { Roles, UserRole } from "@/types";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const session = await getSession();
-  const role =
-    session?.data?.data?.role ??
-    session?.data?.role ??
-    (session?.data as { role?: string })?.role;
 
+  const role: UserRole | undefined = session.data?.data?.role;
+
+ 
   if (!role) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);

@@ -1,28 +1,37 @@
 "use server";
 
+import { SessionResponse } from "@/types";
 import { cookies } from "next/headers";
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
-export async function getSession() {
+export async function getSession(): Promise<SessionResponse> {
   try {
     const cookieStore = await cookies();
+
     const res = await fetch(`${API}/api/user/me`, {
-      headers: { cookie: cookieStore.toString() },
+      headers: {
+        cookie: cookieStore.toString(),
+      },
       cache: "no-store",
     });
-    let session: unknown = null;
-    try {
-      session = await res.json();
-    } catch {
-      session = null;
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok || !json) {
+      return {
+        data: null,
+        error: json ?? { message: "unauthorized" },
+      };
     }
 
-    if (!res.ok || !session) {
-      return { data: null, error: session ?? { message: "unauthorized" } };
-    }
-
-    return { data: session, error: null };
-  } catch {
-    return { data: null, error: { message: "something went wrong" } };
+    return {
+      data: json,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error,
+    };
   }
 }
 

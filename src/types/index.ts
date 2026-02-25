@@ -1,7 +1,3 @@
-/**
- * Shared types for SkillBridge client.
- * Align with backend API and database schema.
- */
 
 export type UserRole = "STUDENT" | "TUTOR" | "ADMIN";
 
@@ -17,6 +13,27 @@ export interface User {
   banned?: boolean;
 }
 
+export const Roles = {
+  ADMIN: "ADMIN",
+  TUTOR: "TUTOR",
+  STUDENT: "STUDENT",
+} as const;
+
+export interface ApiResponse {
+  success: boolean;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    status: string;
+  };
+}
+
+export interface SessionResponse {
+  data: ApiResponse | null;
+  error: unknown;
+}
 export interface TutorProfile {
   id: string;
   userId: string;
@@ -48,7 +65,7 @@ export interface Booking {
   scheduledAt: string;
   status: BookingStatus;
   createdAt: string;
-  
+
   student?: { name: string };
   tutor?: { user?: { name: string } };
 }
