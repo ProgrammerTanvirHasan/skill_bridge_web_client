@@ -56,12 +56,9 @@ export default function TutorProfilePage({
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch(
-          `${API}/api/auth/session`,
-          {
-            credentials: "include",
-          },
-        );
+        const res = await fetch(`${API}/api/user/me`, {
+          credentials: "include",
+        });
         const data = await res.json();
         const user = data?.data?.data ?? data?.data ?? data?.user ?? null;
         const role = user?.role ?? null;

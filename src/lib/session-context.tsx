@@ -35,7 +35,7 @@ export function SessionProvider({
 
   const refreshSession = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/session", { credentials: "include" });
+      const res = await fetch("/api/user/me", { credentials: "include" });
       const data = await res.json();
       const nextUser = data?.data?.data ?? data?.data ?? data?.user ?? null;
       setUserState(nextUser);
