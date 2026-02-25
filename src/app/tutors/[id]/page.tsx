@@ -30,7 +30,9 @@ interface Review {
 }
 
 type UserRole = "STUDENT" | "TUTOR" | "ADMIN" | null;
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://skill-server-application.vercel.app";
 export default function TutorProfilePage({
   params,
 }: {
@@ -54,9 +56,12 @@ export default function TutorProfilePage({
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch("/api/auth/session", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${API}/api/auth/session`,
+          {
+            credentials: "include",
+          },
+        );
         const data = await res.json();
         const user = data?.data?.data ?? data?.data ?? data?.user ?? null;
         const role = user?.role ?? null;

@@ -1,4 +1,3 @@
-
 export type UserRole = "STUDENT" | "TUTOR" | "ADMIN";
 
 export interface User {
@@ -12,6 +11,14 @@ export interface User {
   updatedAt?: string;
   banned?: boolean;
 }
+
+export type SessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: string;
+} | null;
 
 export const Roles = {
   ADMIN: "ADMIN",
@@ -29,7 +36,6 @@ export interface ApiResponse {
     status: string;
   };
 }
-
 export interface SessionResponse {
   data: ApiResponse | null;
   error: unknown;

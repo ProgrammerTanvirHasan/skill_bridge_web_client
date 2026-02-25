@@ -6,14 +6,16 @@ import HomePage from "@/components/ui/featured";
 import Test from "@/components/ui/test";
 import Testimonials from "@/components/ui/testimonial";
 import SkillBridgeFooter from "@/components/ui/footer";
+import { SessionUser } from "@/types";
 
 export default async function CommonLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userResponse = await getSession();
-  const initialUser = userResponse?.data?.data ?? userResponse?.data ?? null;
+  const session = await getSession();
+  
+  const initialUser: SessionUser | null = session.data?.data ?? null;
 
   return (
     <CommonLayoutClient initialUser={initialUser}>
