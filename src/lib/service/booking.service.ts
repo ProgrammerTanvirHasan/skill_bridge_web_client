@@ -2,7 +2,7 @@
 
 import { BookingStatus } from "@/types";
 import { cookies } from "next/headers";
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+const API = process.env.API_URL ?? "http://localhost:5000";
 export async function createBooking(payload: {
   tutorId: number;
   scheduledAt: Date;

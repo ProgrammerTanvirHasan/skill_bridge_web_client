@@ -31,8 +31,7 @@ interface Review {
 
 type UserRole = "STUDENT" | "TUTOR" | "ADMIN" | null;
 const API =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://skill-server-application.vercel.app";
+  process.env.API_URL || "https://skill-server-application.vercel.app";
 export default function TutorProfilePage({
   params,
 }: {

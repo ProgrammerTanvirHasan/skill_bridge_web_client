@@ -43,14 +43,13 @@ export default function BrowseTutorsPage() {
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const API =
+    process.env.API_URL || "https://skill-server-application.vercel.app";
   // Fetch categories once on mount
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch(
-          "https://skill-server-application.vercel.app/api/admin/categories",
-        );
+        const res = await fetch(`${API}/api/admin/categories`);
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
         setCategories(data.data);

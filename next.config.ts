@@ -11,8 +11,23 @@ const nextConfig: NextConfig = {
         source: "/api/user/:path*",
         destination: `${process.env.NEXT_PUBLIC_API_URL}/api/user/:path*`,
       },
+      {
+        source: "/api/tutor/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/tutor/:path*`,
+      },
+      {
+        source: "/api/bookings/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/:path*`,
+      },
+      {
+        source: "/api/reviews/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/:path*`,
+      },
+      {
+        source: "/api/admin/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/admin/:path*`,
+      },
     ];
   },
 };
-
 export default nextConfig;

@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { authClient } from "./auth-client";
 
 type User = {
   id?: string;
@@ -35,9 +36,8 @@ export function SessionProvider({
 
   const refreshSession = useCallback(async () => {
     try {
-      const res = await fetch("/api/user/me", { credentials: "include" });
-      const data = await res.json();
-      const nextUser = data?.data?.data ?? data?.data ?? data?.user ?? null;
+      const session = await authClient.getSession();
+      const nextUser = session?.data?.user ?? session?.data ?? null;
       setUserState(nextUser);
     } catch {
       setUserState(null);

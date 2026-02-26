@@ -9,7 +9,6 @@ export async function proxy(request: NextRequest) {
 
   const role: UserRole | undefined = session.data?.data?.role;
 
- 
   if (!role) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
