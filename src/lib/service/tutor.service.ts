@@ -2,9 +2,8 @@
 
 import { cookies } from "next/headers";
 
-const API = process.env.API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// ✅ Create a new tutor profile
 export async function createTutorProfile(payload: {
   bio: string;
   hourlyRate: number;
@@ -12,7 +11,7 @@ export async function createTutorProfile(payload: {
   categoryIds: number[];
 }) {
   const cookieStore = await cookies();
-  const res = await fetch(`${API}/api/tutor`, {
+  const res = await fetch(`${API_URL}/api/tutor`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,11 +26,10 @@ export async function createTutorProfile(payload: {
   return { data, error: null };
 }
 
-// ✅ Get my own tutor profile
 export async function getMyTutorProfile() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/tutor/me`, {
+    const res = await fetch(`${API_URL}/api/tutor/me`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -45,11 +43,10 @@ export async function getMyTutorProfile() {
   }
 }
 
-// ✅ Get tutor availability
 export async function getAvailability() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/tutor/availability`, {
+    const res = await fetch(`${API_URL}/api/tutor/availability`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -62,7 +59,6 @@ export async function getAvailability() {
   }
 }
 
-// ✅ Get all tutors with optional filters
 export async function getAllTutors(filters?: {
   categoryId?: number;
   minRating?: number;
@@ -77,7 +73,7 @@ export async function getAllTutors(filters?: {
     if (filters?.maxPrice)
       params.append("maxPrice", filters.maxPrice.toString());
 
-    const res = await fetch(`${API}/api/tutor?${params.toString()}`, {
+    const res = await fetch(`${API_URL}/api/tutor?${params.toString()}`, {
       headers: { cookie: (await cookies()).toString() },
       cache: "no-store",
     });
@@ -90,10 +86,9 @@ export async function getAllTutors(filters?: {
   }
 }
 
-// ✅ Get tutor by ID
 export async function getTutorById(id: number) {
   try {
-    const res = await fetch(`${API}/api/tutor/${id}`, {
+    const res = await fetch(`${API_URL}/api/tutor/${id}`, {
       headers: { cookie: (await cookies()).toString() },
       cache: "no-store",
     });
@@ -106,7 +101,6 @@ export async function getTutorById(id: number) {
   }
 }
 
-// ✅ Update tutor profile
 export async function updateTutorProfile(payload: {
   bio?: string;
   hourlyRate?: number;
@@ -115,7 +109,7 @@ export async function updateTutorProfile(payload: {
 }) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/tutor/profile`, {
+    const res = await fetch(`${API_URL}/api/tutor/profile`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +127,6 @@ export async function updateTutorProfile(payload: {
   }
 }
 
-// ✅ Set availability slots
 export async function setAvailability(
   slots: {
     dayOfWeek: number;
@@ -143,7 +136,7 @@ export async function setAvailability(
 ) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/tutor/availability`, {
+    const res = await fetch(`${API_URL}/api/tutor/availability`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

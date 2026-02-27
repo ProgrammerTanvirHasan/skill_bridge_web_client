@@ -1,11 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-const API = process.env.API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function getAllCategories() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/categories`, {
+    const res = await fetch(`${API_URL}/api/admin/categories`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -22,7 +22,7 @@ export async function getAllCategories() {
 export async function createCategory(name: string) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/categories`, {
+    const res = await fetch(`${API_URL}/api/admin/categories`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export async function createCategory(name: string) {
 export async function getAllUsers() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/user`, {
+    const res = await fetch(`${API_URL}/api/user`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -60,7 +60,7 @@ export async function updateUserStatus(
 ) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/users/${userId}`, {
+    const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export async function updateUserStatus(
 export async function getAllBookings() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/bookings`, {
+    const res = await fetch(`${API_URL}/api/admin/bookings`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -95,7 +95,7 @@ export async function getAllBookings() {
 export async function updateCategory(id: number, name: string) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/categories/${id}`, {
+    const res = await fetch(`${API_URL}/api/admin/categories/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export async function updateCategory(id: number, name: string) {
 export async function deleteCategory(id: number) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/admin/categories/${id}`, {
+    const res = await fetch(`${API_URL}/api/admin/categories/${id}`, {
       method: "DELETE",
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",

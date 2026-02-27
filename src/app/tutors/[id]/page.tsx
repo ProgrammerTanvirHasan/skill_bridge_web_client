@@ -55,13 +55,13 @@ export default function TutorProfilePage({
   const [scheduledAt, setScheduledAt] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   useEffect(() => {
     async function fetchTutor() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:5000/api/tutor/${id}`, {
+        const res = await fetch(`${API_URL}/api/tutor/${id}`, {
           credentials: "include",
         });
 
@@ -261,7 +261,6 @@ export default function TutorProfilePage({
           </Card>
         </div>
 
-        {/* Booking Section */}
         <div>
           <Card className="sticky top-24">
             <CardHeader>

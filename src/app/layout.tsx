@@ -7,7 +7,6 @@ import { Toaster } from "sonner";
 import { SessionProvider } from "@/lib/session-context";
 import { getSession } from "@/lib/service/user.service";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

@@ -38,7 +38,6 @@ export function SessionProvider({
   const [user, setUserState] = useState<User>(initialUser);
   const [loading, setLoading] = useState<boolean>(!initialUser);
 
-  // Refresh session from server
   const refreshSession = useCallback(async () => {
     setLoading(true);
     try {

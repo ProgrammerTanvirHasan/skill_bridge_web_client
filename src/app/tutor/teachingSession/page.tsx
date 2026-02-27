@@ -27,7 +27,6 @@ export default async function TutorTeachingSessionPage() {
   const res = await getTutorBookings();
   const allBookings = res.error ? [] : normalizeBookings(res.data ?? null);
 
-  // শুধুমাত্র COMPLETED session filter করা
   const bookings = allBookings.filter((b) => b.status === "COMPLETED");
 
   return (

@@ -42,7 +42,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
 
-  const { setUser, refreshSession } = useSession(); // ✅ use session context
+  const { setUser, refreshSession } = useSession();
 
   const form = useForm({
     defaultValues: {
@@ -63,8 +63,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         }
 
         if (data?.user) {
-          setUser(data.user); // Update context immediately
-          await refreshSession(); // Fetch fresh session from server
+          setUser(data.user);
+          await refreshSession();
         }
 
         toast.success("User logged in successfully", { id: toastId });
@@ -81,9 +81,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000",
+        callbackURL: process.env.NEXT_PUBLIC_CLIENT_URL,
       });
-      await refreshSession(); // ✅ fetch fresh session
     } catch (error) {
       toast.error("Google login failed");
     }

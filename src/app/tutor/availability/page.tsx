@@ -3,9 +3,18 @@ import { Button } from "@/components/ui/button";
 import { getAvailability } from "@/lib/service/tutor.service";
 import { AvailabilityForm } from "./availability-form";
 
-function normalizeSlots(data: unknown): { dayOfWeek: number; startTime: string; endTime: string }[] {
-  const raw = (data && typeof data === "object" && "slots" in data && (data as { slots: unknown }).slots) ?? data;
-  return Array.isArray(raw) ? (raw as { dayOfWeek: number; startTime: string; endTime: string }[]) : [];
+function normalizeSlots(
+  data: unknown,
+): { dayOfWeek: number; startTime: string; endTime: string }[] {
+  const raw =
+    (data &&
+      typeof data === "object" &&
+      "slots" in data &&
+      (data as { slots: unknown }).slots) ??
+    data;
+  return Array.isArray(raw)
+    ? (raw as { dayOfWeek: number; startTime: string; endTime: string }[])
+    : [];
 }
 
 export default async function TutorAvailabilityPage() {

@@ -36,7 +36,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000",
+        callbackURL: process.env.NEXT_PUBLIC_CLIENT_URL,
       });
     } catch (error) {
       toast.error("Google login failed");

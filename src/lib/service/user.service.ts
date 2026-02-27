@@ -2,12 +2,12 @@
 
 import { SessionResponse } from "@/types";
 import { cookies } from "next/headers";
-const API = process.env.API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function getSession(): Promise<SessionResponse> {
   try {
     const cookieStore = await cookies();
 
-    const res = await fetch(`${API}/api/user/me`, {
+    const res = await fetch(`${API_URL}/api/user/me`, {
       headers: {
         cookie: cookieStore.toString(),
       },
@@ -38,7 +38,7 @@ export async function getSession(): Promise<SessionResponse> {
 export async function getAllUsers() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/user`, {
+    const res = await fetch(`${API_URL}/api/user`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -53,7 +53,7 @@ export async function getAllUsers() {
 export async function getUserById(id: string) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/user/${id}`, {
+    const res = await fetch(`${API_URL}/api/user/${id}`, {
       headers: { cookie: cookieStore.toString() },
       cache: "no-store",
     });
@@ -71,7 +71,7 @@ export async function updateProfile(payload: {
 }) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(`${API}/api/user/update`, {
+    const res = await fetch(`${API_URL}/api/user/update`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

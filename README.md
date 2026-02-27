@@ -8,14 +8,14 @@ A full-stack web application that connects learners with expert tutors. This rep
 
 ## Tech Stack
 
-| Layer                  | Technologies                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------- |
-| **Framework**          | Next.js 16 (App Router)                                                         |
-| **UI**                 | React 19, TypeScript, Tailwind CSS 4                                            |
-| **Components**         | Radix UI (accordion, dialog, dropdown, navigation, sheet, etc.)                 |
-| **Forms & Validation** | TanStack Form, Zod                                                              |
-| **Auth**               | Better Auth (client) – backend at `https://skill-server-application.vercel.app` |
-| **Utilities**          | class-variance-authority, clsx, tailwind-merge, lucide-react, sonner            |
+| Layer                  | Technologies                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| **Framework**          | Next.js 16 (App Router)                                                                    |
+| **UI**                 | React 19, TypeScript, Tailwind CSS 4                                                       |
+| **Components**         | Radix UI (accordion, dialog, dropdown, navigation, sheet, etc.)                            |
+| **Forms & Validation** | TanStack Form, Zod                                                                         |
+| **Auth**               | Better Auth (client) – backend at `https://skill-bridge-server-with-prisma-and.vercel.app` |
+| **Utilities**          | class-variance-authority, clsx, tailwind-merge, lucide-react, sonner                       |
 
 See [PROJECT.md](./PROJECT.md) for full specification, roles, routes, and API endpoints.
 
@@ -35,11 +35,11 @@ See [PROJECT.md](./PROJECT.md) for full specification, roles, routes, and API en
    npm run dev
    ```
 
-   Open [http://localhost:3000](http://localhost:3000).
+   Open [https://skill-bridge-client-ruby.vercel.app](https://skill-bridge-client-ruby.vercel.app).
 
 3. **Backend**
 
-   Ensure the SkillBridge API server is running (e.g. at `https://skill-server-application.vercel.app`) for auth and data. Configure `baseURL` in `src/lib/auth-client.ts` if needed.
+   Ensure the SkillBridge API server is running (e.g. at `https://skill-bridge-server-with-prisma-and.vercel.app`) for auth and data. Configure `baseURL` in `src/lib/auth-client.ts` if needed.
 
 ---
 

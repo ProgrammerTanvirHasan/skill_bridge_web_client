@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-const API = process.env.API_URL ?? "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export async function createReview(payload: {
   tutorId: number;
   rating: number;
@@ -9,7 +9,7 @@ export async function createReview(payload: {
   bookingId?: number;
 }) {
   try {
-    const cookieStore = await cookies(); // ✅ inside function
+    const cookieStore = await cookies();
 
     const body: Record<string, unknown> = {
       tutorId: payload.tutorId,
@@ -21,7 +21,7 @@ export async function createReview(payload: {
       body.bookingId = payload.bookingId;
     }
 
-    const res = await fetch(`${API}/api/reviews`, {
+    const res = await fetch(`${API_URL}/api/reviews`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function getMyReviews() {
   try {
     const cookieStore = await cookies();
 
-    const res = await fetch(`${API}/api/reviews`, {
+    const res = await fetch(`${API_URL}/api/reviews`, {
       headers: {
         cookie: cookieStore.toString(),
       },

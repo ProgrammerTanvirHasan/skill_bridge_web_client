@@ -56,7 +56,7 @@ export default function BookedSession() {
   if (loading) return <p className="text-center py-10">Loading bookings…</p>;
 
   return (
-    <div >
+    <div>
       <h1 className="text-3xl font-bold mb-6 text-center">
         All Booked Sessions
       </h1>

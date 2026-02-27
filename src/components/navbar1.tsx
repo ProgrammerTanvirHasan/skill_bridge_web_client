@@ -136,7 +136,6 @@ export function Navbar1({ className }: { className?: string }) {
           </div>
         </nav>
 
-        {/* Mobile - Sheet only after mount to avoid Radix ID hydration mismatch */}
         <div className="lg:hidden flex justify-between items-center">
           <Link href="/" className="font-bold text-lg">
             SkillBridge

@@ -23,8 +23,7 @@ export function StudentBookingTable({
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewedIds, setReviewedIds] = useState<Set<number>>(new Set());
-
-  // Cancel CONFIRMED booking
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   async function handleCancel(id: number) {
     if (!confirm("Cancel this booking?")) return;
     setLoadingId(id);
@@ -58,7 +57,7 @@ export function StudentBookingTable({
     setReviewError(null);
 
     try {
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch(`${API_URL}/api/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +78,6 @@ export function StudentBookingTable({
         return;
       }
 
-      // mark booking as reviewed
       setReviewedIds((prev) => new Set(prev).add(reviewingBooking.id));
       setReviewingBooking(null);
     } catch (error) {
@@ -147,7 +145,6 @@ export function StudentBookingTable({
                 </td>
               </tr>
 
-              {/* Review Form Row */}
               {reviewingBooking?.id === b.id && (
                 <tr key={`${b.id}-review-form`}>
                   <td colSpan={4} className="bg-muted/20 p-4">
