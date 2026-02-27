@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/themProvider";
 import { Toaster } from "sonner";
 import { SessionProvider } from "@/lib/session-context";
 import { getSession } from "@/lib/service/user.service";
-import { SessionUser } from "@/types";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +31,7 @@ export default async function RootLayout({
 }>) {
   const session = await getSession();
 
-  const initialUser: SessionUser | null = session.data?.data ?? null;
+  const initialUser = session.data?.data ?? null;
 
   return (
     <html lang="en" suppressHydrationWarning={true}>

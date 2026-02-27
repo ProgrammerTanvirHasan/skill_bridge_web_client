@@ -6,6 +6,8 @@ import React, {
   useContext,
   useMemo,
   useState,
+  useEffect,
+  ReactNode,
 } from "react";
 import { authClient } from "./auth-client";
 
@@ -21,6 +23,7 @@ type SessionContextValue = {
   user: User;
   setUser: (user: User) => void;
   refreshSession: () => Promise<void>;
+  loading: boolean;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -30,17 +33,22 @@ export function SessionProvider({
   children,
 }: {
   initialUser: User;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const [user, setUserState] = useState<User>(initialUser);
+  const [loading, setLoading] = useState<boolean>(!initialUser);
 
+  // Refresh session from server
   const refreshSession = useCallback(async () => {
+    setLoading(true);
     try {
       const session = await authClient.getSession();
       const nextUser = session?.data?.user ?? session?.data ?? null;
       setUserState(nextUser);
     } catch {
       setUserState(null);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -48,9 +56,15 @@ export function SessionProvider({
     setUserState(value);
   }, []);
 
+  useEffect(() => {
+    if (!initialUser) {
+      refreshSession();
+    }
+  }, [initialUser, refreshSession]);
+
   const value = useMemo(
-    () => ({ user, setUser, refreshSession }),
-    [user, setUser, refreshSession],
+    () => ({ user, setUser, refreshSession, loading }),
+    [user, setUser, refreshSession, loading],
   );
 
   return (
@@ -60,8 +74,6 @@ export function SessionProvider({
 
 export function useSession() {
   const ctx = useContext(SessionContext);
-  if (!ctx) {
-    throw new Error("useSession must be used within SessionProvider");
-  }
+  if (!ctx) throw new Error("useSession must be used within SessionProvider");
   return ctx;
 }

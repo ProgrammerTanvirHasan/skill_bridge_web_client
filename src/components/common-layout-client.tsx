@@ -3,11 +3,19 @@
 import { SessionProvider } from "@/lib/session-context";
 
 export function CommonLayoutClient({
-  initialUser,
+  initialUser = null, 
   children,
 }: {
-  initialUser: { id?: string; name?: string; email?: string; role?: string; [key: string]: unknown } | null;
+  initialUser?: {
+    id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    [key: string]: unknown;
+  } | null;
   children: React.ReactNode;
 }) {
-  return <SessionProvider initialUser={initialUser}>{children}</SessionProvider>;
+  return (
+    <SessionProvider initialUser={initialUser}>{children}</SessionProvider>
+  );
 }

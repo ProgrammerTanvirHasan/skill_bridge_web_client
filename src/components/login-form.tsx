@@ -21,12 +21,15 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import * as z from "zod";
+import { useSession } from "@/lib/session-context";
 
+// Validation
 const formSchema = z.object({
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(8, "Minimum length is 8"),
 });
 
+// Safe redirect
 function isSafeRedirect(path: string | null): path is string {
   if (!path || typeof path !== "string") return false;
   if (!path.startsWith("/")) return false;
@@ -38,6 +41,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
+
+  const { setUser, refreshSession } = useSession(); // ✅ use session context
 
   const form = useForm({
     defaultValues: {
@@ -57,7 +62,13 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
           return;
         }
 
+        if (data?.user) {
+          setUser(data.user); // Update context immediately
+          await refreshSession(); // Fetch fresh session from server
+        }
+
         toast.success("User logged in successfully", { id: toastId });
+
         const target = isSafeRedirect(redirect) ? redirect : "/";
         router.push(target);
       } catch (err) {
@@ -72,6 +83,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         provider: "google",
         callbackURL: "http://localhost:3000",
       });
+      await refreshSession(); // ✅ fetch fresh session
     } catch (error) {
       toast.error("Google login failed");
     }

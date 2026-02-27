@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Star, ArrowLeft } from "lucide-react";
 import { ModeToggle } from "@/components/ui/MoodToggle";
 import { createBooking } from "@/lib/service/booking.service";
+import { useSession } from "@/lib/session-context";
+import { UserRole } from "@/types";
 
 interface Tutor {
   id: number | string;
@@ -29,67 +31,46 @@ interface Review {
   date: string;
 }
 
-type UserRole = "STUDENT" | "TUTOR" | "ADMIN" | null;
-const API =
-  process.env.API_URL || "https://skill-server-application.vercel.app";
+interface Params {
+  id: string;
+}
+
 export default function TutorProfilePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<Params>;
 }) {
-  const { id } = use(params);
+  const { id } = use(params) as Params;
   const router = useRouter();
+
+  const { user, loading: sessionLoading } = useSession();
+  const userRole = user?.role as UserRole | null;
 
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [userRole, setUserRole] = useState<UserRole>(null);
-  const [sessionLoading, setSessionLoading] = useState(true);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [scheduledAt, setScheduledAt] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchSession() {
-      try {
-        const res = await fetch(`${API}/api/user/me`, {
-          credentials: "include",
-        });
-        const data = await res.json();
-        const user = data?.data?.data ?? data?.data ?? data?.user ?? null;
-        const role = user?.role ?? null;
-        setUserRole(
-          role === "STUDENT" || role === "TUTOR" || role === "ADMIN"
-            ? role
-            : null,
-        );
-      } catch {
-        setUserRole(null);
-      } finally {
-        setSessionLoading(false);
-      }
-    }
-    fetchSession();
-  }, []);
-
-  // 2. Fetch tutor details
-  useEffect(() => {
     async function fetchTutor() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API}/api/tutor/${id}`, {
+        const res = await fetch(`http://localhost:5000/api/tutor/${id}`, {
           credentials: "include",
         });
+
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || "Failed to fetch tutor");
         }
-        const json = await res.json();
-        const data = json.data;
+
+        const data = (await res.json()).data;
 
         const fetchedTutor: Tutor = {
           id: data.id,
@@ -125,43 +106,45 @@ export default function TutorProfilePage({
         setLoading(false);
       }
     }
+
     fetchTutor();
   }, [id]);
 
-  function handleBookNowClick() {
-    if (sessionLoading) return;
-    if (userRole !== "STUDENT") {
-      router.push(`/login?redirect=${encodeURIComponent(`/tutors/${id}`)}`);
-      return;
+  // Booking handlers
+  const handleBookNowClick = () => {
+    if (userRole === "STUDENT") {
+      setShowBookingForm(true);
     }
-    setShowBookingForm(true);
-  }
+  };
 
-  async function handleCreateBooking() {
+  const handleCreateBooking = async () => {
     if (!scheduledAt.trim()) {
       setBookingError("Please select date & time");
       return;
     }
+
     const tutorId = Number(id);
     if (Number.isNaN(tutorId)) {
       setBookingError("Invalid tutor");
       return;
     }
+
     const at = new Date(scheduledAt);
     if (Number.isNaN(at.getTime())) {
       setBookingError("Invalid date & time");
       return;
     }
+
     setBookingLoading(true);
     setBookingError(null);
+
     try {
       const result = await createBooking({ tutorId, scheduledAt: at });
-      if (result.error) {
-        const msg =
-          (result.error as { message?: string })?.message || "Booking failed";
-        setBookingError(msg);
+      if ((result as any)?.error) {
+        setBookingError((result as any).error.message || "Booking failed");
         return;
       }
+
       setShowBookingForm(false);
       setScheduledAt("");
       router.push("/dashboard/bookings");
@@ -172,13 +155,12 @@ export default function TutorProfilePage({
     } finally {
       setBookingLoading(false);
     }
-  }
+  };
 
-  if (loading) {
-    return <p className="py-12 text-center">Loading tutor profile...</p>;
-  }
-
-  if (error) {
+  // Loading / error states
+  if (loading || sessionLoading)
+    return <p className="py-12 text-center">Loading...</p>;
+  if (error)
     return (
       <div className="py-12 text-center">
         <p className="text-red-600">{error}</p>
@@ -187,9 +169,7 @@ export default function TutorProfilePage({
         </Button>
       </div>
     );
-  }
-
-  if (!tutor) {
+  if (!tutor)
     return (
       <div className="py-12 text-center">
         <p className="text-muted-foreground">Tutor not found.</p>
@@ -198,7 +178,6 @@ export default function TutorProfilePage({
         </Button>
       </div>
     );
-  }
 
   return (
     <div className="min-h-screen py-8 md:py-12">
@@ -213,6 +192,7 @@ export default function TutorProfilePage({
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        {/* Tutor Info */}
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -243,6 +223,7 @@ export default function TutorProfilePage({
             </CardContent>
           </Card>
 
+          {/* Reviews */}
           <Card>
             <CardHeader>
               <CardTitle>Reviews</CardTitle>
@@ -280,6 +261,7 @@ export default function TutorProfilePage({
           </Card>
         </div>
 
+        {/* Booking Section */}
         <div>
           <Card className="sticky top-24">
             <CardHeader>
@@ -292,8 +274,14 @@ export default function TutorProfilePage({
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              {sessionLoading ? (
-                <p className="text-sm text-muted-foreground">Checking…</p>
+              {!user ? (
+                <Button asChild size="lg" className="w-full">
+                  <Link
+                    href={`/login?redirect=${encodeURIComponent(`/tutors/${id}`)}`}
+                  >
+                    Log in to book
+                  </Link>
+                </Button>
               ) : userRole === "STUDENT" ? (
                 !showBookingForm ? (
                   <Button
@@ -305,15 +293,13 @@ export default function TutorProfilePage({
                   </Button>
                 ) : (
                   <>
-                    <div className="space-y-2">
-                      <Label htmlFor="scheduledAt">Date & time</Label>
-                      <Input
-                        id="scheduledAt"
-                        type="datetime-local"
-                        value={scheduledAt}
-                        onChange={(e) => setScheduledAt(e.target.value)}
-                      />
-                    </div>
+                    <Label htmlFor="scheduledAt">Date & time</Label>
+                    <Input
+                      id="scheduledAt"
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => setScheduledAt(e.target.value)}
+                    />
                     {bookingError && (
                       <p className="text-sm text-red-600">{bookingError}</p>
                     )}
@@ -327,23 +313,11 @@ export default function TutorProfilePage({
                     </Button>
                   </>
                 )
-              ) : userRole === "TUTOR" || userRole === "ADMIN" ? (
-                <p className="text-sm text-muted-foreground">
-                  Only students can book sessions.
-                </p>
               ) : (
-                <>
-                  <Button asChild size="lg" className="w-full">
-                    <Link
-                      href={`/login?redirect=${encodeURIComponent(`/tutors/${id}`)}`}
-                    >
-                      Log in to book
-                    </Link>
-                  </Button>
-                  <p className="text-center text-xs text-muted-foreground">
-                    Sign in as a student to book this tutor.
-                  </p>
-                </>
+                <p className="text-sm text-muted-foreground">
+                  Only students can book a session. Please contact support or
+                  change your account type.
+                </p>
               )}
             </CardContent>
           </Card>

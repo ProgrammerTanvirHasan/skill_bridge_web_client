@@ -23,13 +23,12 @@ interface Tutor {
   id: string;
   name: string;
   hourlyRate: number;
-  rating: number; // Average rating (calculated in backend ideally)
-  reviewsCount: number; // Number of reviews
+  rating: number;
+  reviewsCount: number;
   bio: string;
-  subjects: string[]; // We'll map categories to subjects
+  subjects: string[];
 }
 
-// Helper: Calculate average rating from reviews if needed (you can do this backend side)
 function calcAverageRating(reviews: { rating: number }[]) {
   if (!reviews.length) return 0;
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
@@ -45,11 +44,11 @@ export default function BrowseTutorsPage() {
   const [error, setError] = useState<string | null>(null);
   const API =
     process.env.API_URL || "https://skill-server-application.vercel.app";
-  // Fetch categories once on mount
+
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch(`${API}/api/admin/categories`);
+        const res = await fetch(`http://localhost:5000/api/admin/categories`);
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
         setCategories(data.data);
@@ -61,21 +60,19 @@ export default function BrowseTutorsPage() {
     fetchCategories();
   }, []);
 
-  // Fetch tutors from backend API based on selected filters
   useEffect(() => {
     async function fetchTutors() {
       setLoading(true);
       setError(null);
       try {
         const params = new URLSearchParams();
-        // Find categoryId from category name
+
         if (category !== "All") {
           const cat = categories.find((c) => c.name === category);
           if (cat) params.append("categoryId", cat.id.toString());
         }
-        // No minRating and maxPrice filters here, add if you want
 
-        const url = `https://skill-server-application.vercel.app/api/tutor?${params.toString()}`;
+        const url = `http://localhost:5000/api/tutor?${params.toString()}`;
 
         const res = await fetch(url, { method: "GET", credentials: "include" });
         if (!res.ok) {
