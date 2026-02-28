@@ -11,12 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  getAllCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-} from "@/lib/service/admin.service";
+import { getAllCategories } from "@/lib/service/admin.service";
+import { API_URL } from "@/lib/api-url";
 
 type CategoryRow = { id: number | string; name: string };
 
@@ -46,8 +42,17 @@ export default function AdminCategoriesPage() {
     setError(null);
     setSuccess(false);
     try {
-      const result = await createCategory(categoryName.trim());
-      if (result.error) throw new Error("Failed to create category");
+      const res = await fetch(`${API_URL}/api/admin/categories`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: categoryName.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          (data as { message?: string }).message ?? "Failed to create category",
+        );
       setSuccess(true);
       setCategoryName("");
       setLoadCategories(true);
@@ -60,30 +65,52 @@ export default function AdminCategoriesPage() {
 
   const handleUpdate = async (id: number | string) => {
     if (!editName.trim()) return;
-    const result = await updateCategory(Number(id), editName.trim());
-    if (result.error) {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/categories/${Number(id)}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          (data as { message?: string }).message ?? "Failed to update category",
+        );
+      setCategories((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, name: editName.trim() } : c)),
+      );
+      setEditingId(null);
+      setEditName("");
+    } catch {
       alert("Failed to update category");
-      return;
     }
-    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, name: editName.trim() } : c)));
-    setEditingId(null);
-    setEditName("");
   };
 
   const handleDelete = async (id: number | string) => {
     if (!confirm("Delete this category?")) return;
-    const result = await deleteCategory(Number(id));
-    if (result.error) {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/categories/${Number(id)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          (data as { message?: string }).message ?? "Failed to delete category",
+        );
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+    } catch {
       alert("Failed to delete category");
-      return;
     }
-    setCategories((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
     <div className="py-8 max-w-2xl">
       <h1 className="text-3xl font-bold text-foreground mb-4">Categories</h1>
-      <p className="text-muted-foreground mb-6">Create and manage categories.</p>
+      <p className="text-muted-foreground mb-6">
+        Create and manage categories.
+      </p>
 
       <Card className="mb-6">
         <CardHeader>
@@ -104,7 +131,9 @@ export default function AdminCategoriesPage() {
             </Button>
           </form>
           {error && <p className="text-destructive mt-2">{error}</p>}
-          {success && <p className="text-green-600 mt-2">Category added successfully!</p>}
+          {success && (
+            <p className="text-green-600 mt-2">Category added successfully!</p>
+          )}
         </CardContent>
       </Card>
 
@@ -143,19 +172,42 @@ export default function AdminCategoriesPage() {
                       <td className="p-3 text-right">
                         {editingId === c.id ? (
                           <>
-                            <Button size="sm" variant="ghost" onClick={() => handleUpdate(c.id)}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleUpdate(c.id)}
+                            >
                               Save
                             </Button>
-                            <Button size="sm" variant="ghost" onClick={() => { setEditingId(null); setEditName(""); }}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingId(null);
+                                setEditName("");
+                              }}
+                            >
                               Cancel
                             </Button>
                           </>
                         ) : (
                           <>
-                            <Button size="sm" variant="ghost" onClick={() => { setEditingId(c.id); setEditName(c.name); }}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingId(c.id);
+                                setEditName(c.name);
+                              }}
+                            >
                               Edit
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDelete(c.id)}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive"
+                              onClick={() => handleDelete(c.id)}
+                            >
                               Delete
                             </Button>
                           </>

@@ -111,6 +111,7 @@ export async function updateTutorProfile(payload: {
     const cookieStore = await cookies();
     const res = await fetch(`${API_URL}/api/tutor/profile`, {
       method: "PUT",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         cookie: cookieStore.toString(),

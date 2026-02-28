@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { setAvailability } from "@/lib/service/tutor.service";
+import { API_URL } from "@/lib/api-url";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -50,8 +50,14 @@ export function AvailabilityForm({ initialSlots }: { initialSlots: Slot[] }) {
     setError(null);
     setSuccess(false);
     try {
-      const result = await setAvailability(slots);
-      if (result.error) throw new Error("Failed to save");
+      const res = await fetch(`${API_URL}/api/tutor/availability`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slots }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to save");
       setSuccess(true);
       router.refresh();
     } catch {

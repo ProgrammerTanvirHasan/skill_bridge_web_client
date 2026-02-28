@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 // import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  createTutorProfile,
-  updateTutorProfile,
-} from "@/lib/service/tutor.service";
+import { API_URL } from "@/lib/api-url";
 import { useSession } from "@/lib/session-context";
 
 type ProfileData = {
@@ -110,11 +107,23 @@ export function TutorProfileForm({
       };
 
       if (hasProfile) {
-        const res = await updateTutorProfile(payload);
-        if (res.error) throw new Error("Failed to update profile");
+        const res = await fetch(`${API_URL}/api/tutor/profile`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to update profile");
       } else {
-        const res = await createTutorProfile(payload);
-        if (res.error) throw new Error("Failed to create profile");
+        const res = await fetch(`${API_URL}/api/tutor`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to create profile");
         setHasProfile(true);
       }
 

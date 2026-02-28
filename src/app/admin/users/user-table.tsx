@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateUserStatus } from "@/lib/service/admin.service";
+
 import type { User } from "@/types";
+import { API_URL } from "@/lib/api-url";
 
 type UserRow = User & { banned?: boolean };
 
@@ -20,8 +21,14 @@ export function AdminUserTable({ initialUsers }: { initialUsers: UserRow[] }) {
     const newStatus = currentlyBanned ? "ACTIVE" : "BANNED";
     setLoadingIds((prev) => new Set(prev).add(userId));
     try {
-      const result = await updateUserStatus(userId, newStatus);
-      if (result.error) throw new Error("Failed to update status");
+      const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to update status");
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, banned: newStatus === "BANNED" } : u)),
       );

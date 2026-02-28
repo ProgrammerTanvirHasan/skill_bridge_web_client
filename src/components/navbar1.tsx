@@ -78,7 +78,7 @@ export function Navbar1({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="container px-6">
+      <div className=" px-2">
         {/* Desktop */}
         <nav className="hidden items-center justify-between lg:flex">
           <Link
@@ -96,10 +96,7 @@ export function Navbar1({ className }: { className?: string }) {
                   <NavigationMenuLink asChild>
                     <Link
                       href={item.url}
-                      className={cn(
-                        "group inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium hover:bg-muted",
-                        item.title === "Chart_Bar" && "text-white",
-                      )}
+                      className="group inline-flex h-10 items-center rounded-md px-4 py-2 text-sm font-medium hover:bg-muted"
                     >
                       {item.title}
                     </Link>

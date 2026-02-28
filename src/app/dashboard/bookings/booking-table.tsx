@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { Booking, BookingStatus } from "@/types";
-import { updateBookingStatus } from "@/lib/service/booking.service";
+import { API_URL } from "@/lib/api-url";
 
 export function StudentBookingTable({
   initialBookings,
@@ -23,16 +23,18 @@ export function StudentBookingTable({
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewedIds, setReviewedIds] = useState<Set<number>>(new Set());
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   async function handleCancel(id: number) {
     if (!confirm("Cancel this booking?")) return;
     setLoadingId(id);
     try {
-      const result = await updateBookingStatus(
-        id,
-        "CANCELLED" as BookingStatus,
-      );
-      if (result.error) throw new Error("Failed to cancel");
+      const res = await fetch(`${API_URL}/api/bookings/${id}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CANCELLED" as BookingStatus }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to cancel");
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: "CANCELLED" } : b)),
       );

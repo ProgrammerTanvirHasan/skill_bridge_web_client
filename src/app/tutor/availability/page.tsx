@@ -1,25 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getAvailability } from "@/lib/service/tutor.service";
+import { API_URL } from "@/lib/api-url";
 import { AvailabilityForm } from "./availability-form";
 
-function normalizeSlots(
-  data: unknown,
-): { dayOfWeek: number; startTime: string; endTime: string }[] {
+type Slot = { dayOfWeek: number; startTime: string; endTime: string };
+
+function normalizeSlots(data: unknown): Slot[] {
   const raw =
     (data &&
       typeof data === "object" &&
       "slots" in data &&
       (data as { slots: unknown }).slots) ??
     data;
-  return Array.isArray(raw)
-    ? (raw as { dayOfWeek: number; startTime: string; endTime: string }[])
-    : [];
+  return Array.isArray(raw) ? (raw as Slot[]) : [];
 }
 
-export default async function TutorAvailabilityPage() {
-  const result = await getAvailability();
-  const initialSlots = normalizeSlots(result.data ?? null);
+export default function TutorAvailabilityPage() {
+  const [initialSlots, setInitialSlots] = useState<Slot[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/tutor/availability`, {
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => null);
+        setInitialSlots(res.ok ? normalizeSlots(data?.data ?? data) : []);
+      } catch {
+        setInitialSlots([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return (
     <div className="py-8">
@@ -27,7 +44,11 @@ export default async function TutorAvailabilityPage() {
       <p className="mt-2 text-muted-foreground">
         Set your available time slots for tutoring.
       </p>
-      <AvailabilityForm initialSlots={initialSlots} />
+      {loading ? (
+        <p className="mt-6 text-muted-foreground">Loading availability…</p>
+      ) : (
+        <AvailabilityForm initialSlots={initialSlots} />
+      )}
       <Button asChild variant="outline" className="mt-6">
         <Link href="/tutor">Back to dashboard</Link>
       </Button>

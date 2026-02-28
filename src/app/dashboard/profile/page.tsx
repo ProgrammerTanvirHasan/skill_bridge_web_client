@@ -11,7 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getSession, updateProfile } from "@/lib/service/user.service";
+import { API_URL } from "@/lib/api-url";
+import { getSession } from "@/lib/service/user.service";
 
 function getUser(data: unknown): { name?: string; email?: string } | null {
   if (!data || typeof data !== "object") return null;
@@ -32,11 +33,30 @@ export default function StudentProfilePage() {
 
   useEffect(() => {
     (async () => {
-      const res = await getSession();
-      const user = getUser(res.data);
-      if (user) {
-        setName(user.name ?? "");
-        setEmail(user.email ?? "");
+      try {
+        const res = await fetch(`${API_URL}/api/user/me`, {
+          credentials: "include",
+        });
+        const json = await res.json().catch(() => null);
+        const user = getUser(res.ok ? json : null);
+        if (user) {
+          setName(user.name ?? "");
+          setEmail(user.email ?? "");
+        } else {
+          const fallback = await getSession();
+          const u = getUser(fallback.data);
+          if (u) {
+            setName(u.name ?? "");
+            setEmail(u.email ?? "");
+          }
+        }
+      } catch {
+        const fallback = await getSession();
+        const u = getUser(fallback.data);
+        if (u) {
+          setName(u.name ?? "");
+          setEmail(u.email ?? "");
+        }
       }
     })();
   }, []);
@@ -47,8 +67,14 @@ export default function StudentProfilePage() {
     setError(null);
     setSuccess(false);
     try {
-      const result = await updateProfile({ name: name.trim(), email: email.trim() });
-      if (result.error) throw new Error("Failed to update");
+      const res = await fetch(`${API_URL}/api/user/update`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to update");
       setSuccess(true);
     } catch {
       setError("Failed to update profile.");

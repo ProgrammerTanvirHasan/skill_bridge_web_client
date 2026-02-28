@@ -1,7 +1,10 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTutorBookings } from "@/lib/service/booking.service";
+import { API_URL } from "@/lib/api-url";
 import type { Booking } from "@/types";
 
 function normalizeBookings(data: unknown): Booking[] {
@@ -23,11 +26,26 @@ function normalizeBookings(data: unknown): Booking[] {
   return [];
 }
 
-export default async function TutorTeachingSessionPage() {
-  const res = await getTutorBookings();
-  const allBookings = res.error ? [] : normalizeBookings(res.data ?? null);
+export default function TutorTeachingSessionPage() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const bookings = allBookings.filter((b) => b.status === "COMPLETED");
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/bookings/tutor/me`, {
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => null);
+        const allBookings = res.ok ? normalizeBookings(data?.data ?? data) : [];
+        setBookings(allBookings.filter((b) => b.status === "COMPLETED"));
+      } catch {
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return (
     <div className="py-8">
@@ -41,7 +59,9 @@ export default async function TutorTeachingSessionPage() {
           <CardTitle>Completed Sessions</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {bookings.length === 0 ? (
+          {loading ? (
+            <p className="p-6 text-muted-foreground">Loading sessions…</p>
+          ) : bookings.length === 0 ? (
             <p className="p-6 text-muted-foreground">
               No completed teaching sessions yet.
             </p>

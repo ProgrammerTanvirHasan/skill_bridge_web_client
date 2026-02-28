@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Star, ArrowRight } from "lucide-react";
 import { ModeToggle } from "@/components/ui/MoodToggle";
+import { API_URL } from "@/lib/api-url";
 
 interface Category {
   id: number;
@@ -42,7 +43,6 @@ export default function BrowseTutorsPage() {
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     async function fetchCategories() {

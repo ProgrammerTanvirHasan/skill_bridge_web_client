@@ -48,9 +48,10 @@ const navConfig: Record<
   tutor: {
     title: "Tutor",
     items: [
+      { title: "Profile", url: "/tutor/profile", icon: User },
       { title: "Availability", url: "/tutor/availability", icon: Calendar },
       { title: "Booking", url: "/tutor/bookingSession", icon: ShoppingBasket },
-      { title: "Profile", url: "/tutor/profile", icon: User },
+
       {
         title: "Teaching sessions",
         url: "/tutor/teachingSession",

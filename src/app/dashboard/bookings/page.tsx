@@ -1,7 +1,10 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTutorBookings } from "@/lib/service/booking.service";
+import { API_URL } from "@/lib/api-url";
 import type { Booking } from "@/types";
 import { StudentBookingTable } from "./booking-table";
 
@@ -24,9 +27,26 @@ function normalizeBookings(data: unknown): Booking[] {
   return [];
 }
 
-export default async function DashboardBookingsPage() {
-  const result = await getTutorBookings();
-  const bookings = result.error ? [] : normalizeBookings(result.data ?? null);
+export default function DashboardBookingsPage() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/bookings/tutor/me`, {
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => null);
+        const list = res.ok ? normalizeBookings(data?.data ?? data) : [];
+        setBookings(list);
+      } catch {
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   return (
     <div className="py-8">
@@ -40,7 +60,11 @@ export default async function DashboardBookingsPage() {
           <CardTitle>All bookings</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <StudentBookingTable initialBookings={bookings} />
+          {loading ? (
+            <p className="p-6 text-muted-foreground">Loading bookings...</p>
+          ) : (
+            <StudentBookingTable initialBookings={bookings} />
+          )}
         </CardContent>
       </Card>
 

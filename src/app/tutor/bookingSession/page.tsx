@@ -10,10 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  getTutorBookings,
-  updateBookingStatus,
-} from "@/lib/service/booking.service";
+import { API_URL } from "@/lib/api-url";
 import { BookingStatus } from "@/types";
 
 interface Booking {
@@ -23,18 +20,37 @@ interface Booking {
   status: BookingStatus;
 }
 
+function normalizeBookings(data: unknown): Booking[] {
+  if (Array.isArray(data)) return data as Booking[];
+  if (
+    data &&
+    typeof data === "object" &&
+    "data" in data &&
+    Array.isArray((data as { data: unknown }).data)
+  )
+    return (data as { data: Booking[] }).data;
+  return [];
+}
+
 export default function BookedSession() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   useEffect(() => {
-    async function fetchBookings() {
-      const res = await getTutorBookings();
-      if (!res.error) setBookings(res.data);
-      setLoading(false);
-    }
-    fetchBookings();
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/bookings/tutor/me`, {
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => null);
+        if (res.ok) setBookings(normalizeBookings(data?.data ?? data));
+      } catch {
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const handleStatusChange = async (
@@ -42,15 +58,23 @@ export default function BookedSession() {
     newStatus: BookingStatus,
   ) => {
     setUpdatingId(bookingId);
-    const res = await updateBookingStatus(bookingId, newStatus);
-    if (!res.error) {
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { message?: string }).message ?? "Failed to update status");
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b)),
       );
-    } else {
-      alert(res.error.message || "Failed to update status");
+    } catch {
+      alert("Failed to update status");
+    } finally {
+      setUpdatingId(null);
     }
-    setUpdatingId(null);
   };
 
   if (loading) return <p className="text-center py-10">Loading bookings…</p>;

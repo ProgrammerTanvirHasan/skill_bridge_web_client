@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Star, ArrowLeft } from "lucide-react";
 import { ModeToggle } from "@/components/ui/MoodToggle";
-import { createBooking } from "@/lib/service/booking.service";
+import { API_URL } from "@/lib/api-url";
 import { useSession } from "@/lib/session-context";
 import { UserRole } from "@/types";
 
@@ -55,7 +55,6 @@ export default function TutorProfilePage({
   const [scheduledAt, setScheduledAt] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   useEffect(() => {
     async function fetchTutor() {
       setLoading(true);
@@ -139,12 +138,20 @@ export default function TutorProfilePage({
     setBookingError(null);
 
     try {
-      const result = await createBooking({ tutorId, scheduledAt: at });
-      if ((result as any)?.error) {
-        setBookingError((result as any).error.message || "Booking failed");
+      const res = await fetch(`${API_URL}/api/bookings`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tutorId,
+          scheduledAt: at.toISOString(),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setBookingError((data as { message?: string }).message || "Booking failed");
         return;
       }
-
       setShowBookingForm(false);
       setScheduledAt("");
       router.push("/dashboard/bookings");

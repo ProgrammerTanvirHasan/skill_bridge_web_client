@@ -1,43 +1,50 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getMyReviews } from "@/lib/service/review.service";
+import { API_URL } from "@/lib/api-url";
 
-function normalizeReviews(data: unknown): {
+type Review = {
   id: string;
   rating: number;
   comment?: string;
   student?: { name?: string };
-}[] {
-  if (Array.isArray(data))
-    return data as {
-      id: string;
-      rating: number;
-      comment?: string;
-      student?: { name?: string };
-    }[];
+};
+
+function normalizeReviews(data: unknown): Review[] {
+  if (Array.isArray(data)) return data as Review[];
   if (
     data &&
     typeof data === "object" &&
     "data" in data &&
     Array.isArray((data as { data: unknown }).data)
   )
-    return (
-      data as {
-        data: {
-          id: string;
-          rating: number;
-          comment?: string;
-          student?: { name?: string };
-        }[];
-      }
-    ).data;
+    return (data as { data: Review[] }).data;
   return [];
 }
 
-export default async function TutorRatingReviewsPage() {
-  const result = await getMyReviews();
-  const reviews = result.error ? [] : normalizeReviews(result.data ?? null);
+export default function TutorRatingReviewsPage() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/reviews`, {
+          credentials: "include",
+        });
+        const data = await res.json().catch(() => null);
+        setReviews(res.ok ? normalizeReviews(data?.data ?? data) : []);
+      } catch {
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
   const totalReviews = reviews.length;
   const averageRating =
     totalReviews > 0
@@ -55,10 +62,14 @@ export default async function TutorRatingReviewsPage() {
           <CardTitle>Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">
-            {totalReviews > 0 ? `${averageRating.toFixed(1)} / 5` : "—"} (
-            {totalReviews} reviews)
-          </p>
+          {loading ? (
+            <p className="text-muted-foreground">Loading…</p>
+          ) : (
+            <p className="text-2xl font-bold">
+              {totalReviews > 0 ? `${averageRating.toFixed(1)} / 5` : "—"} (
+              {totalReviews} reviews)
+            </p>
+          )}
         </CardContent>
       </Card>
       <Card className="mt-6 overflow-hidden">
@@ -66,7 +77,9 @@ export default async function TutorRatingReviewsPage() {
           <CardTitle>All reviews</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {reviews.length === 0 ? (
+          {loading ? (
+            <p className="p-6 text-muted-foreground">Loading reviews…</p>
+          ) : reviews.length === 0 ? (
             <p className="p-6 text-muted-foreground">No reviews yet.</p>
           ) : (
             <ul className="divide-y">
